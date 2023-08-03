@@ -1,5 +1,24 @@
 import { getConstructor } from './utils.js';
 export const stateBindings = {
+  'component': async ({node, component}) => {
+    if (component && getConstructor(component) === 'Component') {
+      node.replaceWith(component.fragment);
+      component.applyDeferreds();
+      component.doOnMounts();
+    }
+    else node.remove();
+  },
+  'list': ({node, list}) => {
+    if (list && list.every(l => getConstructor(l) === 'Component')) {
+      const aggregate = new DocumentFragment();
+      const deferreds = list.flatMap(({applyDeferreds, doOnMounts}) => [applyDeferreds, doOnMounts]);
+      list.forEach(({fragment}) => {
+        aggregate.append(fragment);
+      });
+      node.replaceWith(aggregate);
+      deferreds.forEach(deferred => {deferred()});
+    } else node.remove();
+  },
   'event': ({node, event, handler}) => {
     node.addEventListener(event, handler);
   },
@@ -53,23 +72,6 @@ export const stateBindings = {
     }
     if (['string', 'number'].includes(typeof result)) node.setAttribute(attr, result);
   }),
-  'edit': ({node, editorNode, textState}) => {
-    node.classList.add('editable-container');
-    node.appendChild(editorNode);
-    editorNode = node.childNodes[node.childNodes.length-1];
-    const input = editorNode.querySelector('input, textarea, select');
-    input.addEventListener('change', ({target}) => {
-      switch (target.getAttribute('type')) {
-        case 'text':
-          const currentVal = textState.is();
-          const textNode = Array.from(node.childNodes).find(child => child.nodeType === Node.TEXT_NODE && child.textContent.trim() === currentVal);
-          textNode.textContent = target.value;
-        break;
-        default:
-        break;
-      };
-    });
-  },
   'text': ({node, is, state}) => {
     if (is)    node.textContent = is.evaluate();
     if (state) node.textContent = state.is();

@@ -1,4 +1,5 @@
 import { getConstructor, select } from "./utils.js";
+import { IsJs } from './is.js';
 export const StateManager = function(state) {
   this.val = state;
   this.components = new Set();
@@ -46,7 +47,8 @@ export function Is (arr, vals) {
     return new Function(`return ${expr.join('')}`)();
   };
 };
-export function Render(components) {
+export function Render() {
+  const components = Array.from(IsJs.registry);
   const lists = select('list');
   const singles = select('component');
   lists.forEach(listNode => {
@@ -54,12 +56,12 @@ export function Render(components) {
     if (name && name in components) {
       const aggregate = new DocumentFragment();
       const deferreds = components[name].flatMap(({deferredBindings}) => deferredBindings);
-      components[name].forEach(({fragment, doOnMount, nodes, deferredBindings}) => {
+      components[name].forEach(({fragment, onMounts, nodes}) => {
         aggregate.append(fragment);
-        doOnMount.forEach(cb => {cb && typeof cb === 'function' && cb(nodes)});
+        onMounts.forEach(cb => {cb && typeof cb === 'function' && cb(nodes)});
       });
       listNode.replaceWith(aggregate);
-      deferreds.forEach(cb => cb && typeof cb === 'function' && cb());
+      deferreds.forEach(cb => {cb && typeof cb === 'function' && cb()});
     }
     else listNode.remove();
   });

@@ -8,7 +8,7 @@ export const traverseFragment = (fragment, cb) => { Array.from(fragment.childNod
 
 const events = Object.keys(window).filter(key => key.startsWith('on')).map(key => key.slice(2).toLowerCase());
 const bindings = [
-  ...events, 'class', 'press', 'edit', 'if', 'state', 'replace', 'textinput'
+  ...events, 'list', 'component', 'class', 'press', 'edit', 'if', 'state', 'textinput'
 ];
 export const parseDataBinding = attr => {
   if (attr.startsWith('data-')) {

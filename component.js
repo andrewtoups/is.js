@@ -1,8 +1,9 @@
 import { StateManager, Is } from './engine.js';
+import { IsJs } from './is.js';
 import { stateBindings } from './stateBindings.js';
 import { getConstructor, traverseFragment, parseDataBinding } from './utils.js';
 
-export default function Component() {
+function Component(caller) {
   this.params = new Map();
   this.addParam = ({name, value}) => {this.params.set(name, value)};
   this.bindingRefs = [];
@@ -18,15 +19,18 @@ export default function Component() {
     return new Is(strArr, states);
   };
   this.fragment   = null;
+  this.arrs       = [];
   this.states     = [];
   this.ises       = [];
+  this.comps      = [];
   this.nodes      = [];
   this.funcs      = [];
   this.bools      = [];
   this.objs       = [];
-  this.doOnMount  = new Set();
-  this.onMount = onMount => {if (onMount && typeof onMount === 'function') this.doOnMount.add(onMount)};
-  this.template = (htmlArr, ...values) => {
+  this.onMounts  = new Set();
+  this.onMount = onMount => {onMount && typeof onMount === 'function' && this.onMounts.add(onMount)};
+  this.doOnMounts = () => {this.onMounts.forEach(cb => {cb(this.nodes)})};
+  this.template = async (htmlArr, ...values) => {
     const html = [htmlArr[0]];
     values.forEach((val, i) => {
       switch (typeof val) {
@@ -45,6 +49,10 @@ export default function Component() {
         case 'object':
 
           switch (getConstructor(val)) {
+            case 'Array':
+              html.push(`arr_${this.arrs.length}`);
+              this.arrs.push(val);
+            break;
             case 'StateManager':
               html.push(`state_${this.states.length}`);
               this.states.push(val);
@@ -52,6 +60,10 @@ export default function Component() {
             case 'Is':
               html.push(`is_${this.ises.length}`);
               this.ises.push(val);
+            break;
+            case 'Component':
+              html.push(`comp_${this.comps.length}`);
+              this.comps.push(val);
             break;
             default:
               html.push(`obj_${this.objs.length}`);
@@ -73,10 +85,11 @@ export default function Component() {
     this.nodes = Array.from(fragment.childNodes);
   };
   this.deferredBindings = [];
-  this.handleBindings = node => {
+  this.applyDeferreds = () => {this.deferredBindings.forEach(cb => {cb && typeof cb === 'function' && cb()})};
+  this.handleBindings = async node => {
     const isElement = node.nodeType === 1;
     const childNodes = Array.from(node.childNodes);
-    const annotations = ['func_', 'bool_', 'state_', 'is_', 'obj_'];
+    const annotations = ['func_', 'bool_', 'obj_', 'arr_', 'state_', 'is_', 'comp_'];
     const statefulBindings = isElement ? Object.values(node.attributes).filter(({value}) => {
       return annotations.some(str => value.includes(str));
     }).map(({name, value}) => {
@@ -93,16 +106,26 @@ export default function Component() {
       const isFunc  = type === 'func';
       const isBool  = type === 'bool';
       const isObj   = type === 'obj';
-      const isIs    = type === 'is';
+      const isArr   = type === 'arr';
       const isState = type === 'state';
-      const isComp = isObj && getConstructor(accessor) === 'Component';
+      const isIs    = type === 'is';
+      const isComp  = type === 'comp';
+      const isStr   = typeof accessor === 'string';
 
       const isData = attr.startsWith('data-');
       
       const is = isIs && accessor;
       const binding = parseDataBinding(attr);
       switch (binding) {
-  
+
+        case 'component':
+          if (isComp) stateBindings['component']({node, component: accessor});
+        break;
+
+        case 'list':
+          if (isArr) stateBindings['list']({node, list: accessor});
+        break;
+
         case 'event':
           if (isFunc && isData) stateBindings.event({node, event: attr.split('data-')[1], handler: accessor});
         break;
@@ -150,7 +173,6 @@ export default function Component() {
         case 'textinput':
           if (isState && ['INPUT', 'TEXTAREA', 'SELECT'].includes(node.tagName)) {
             node.addEventListener('keyup', ({target}) => {
-              // target.value = node.value.split('⠀').join('')+'⠀';
               accessor.set(target.value);
             });
             const applyBinding = () => stateBindings['textinput']({node, state: accessor});
@@ -183,32 +205,9 @@ export default function Component() {
             stateBindings['attr']({node, attr, accessor});
           }
         break;
-
-        case 'replace':
-          if (isObj && accessor) node.replaceWith(accessor);
-        break;
-  
-        case 'edit':
-          if (isComp) {
-            const editor = accessor;
-            if (node.tagName === 'A' && node.getAttribute('href') !== null) {
-              const editingState = editor.params.get('editingState');
-              if (editingState !== null) {
-                const hrefState = editor.params.get('hrefState');
-                const href = node.getAttribute('href');
-                editor.params.get('editingState').onSet(({newVal}) => {
-                  if (newVal === true) node.removeAttribute('href');
-                  else if (hrefState) node.setAttribute('href', hrefState.is());
-                  else node.setAttribute('href', href);
-                });
-              }
-            }
-            const editorNode = editor.fragment;
-            stateBindings['edit']({node, editorNode, textState: editor.params.get('textState')});
-          }
-        break;
   
         default:
+          IsJs.parseCustomBinding({node, accessor, component: this, bindingName: binding, type});
         break;
       }
       if (isData) node.removeAttribute(attr);
@@ -244,3 +243,4 @@ export default function Component() {
     if (childNodes) childNodes.forEach(this.handleBindings);
   };
 };
+export { Component };
