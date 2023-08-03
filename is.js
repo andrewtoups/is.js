@@ -1,3 +1,4 @@
+import { Component } from './component.js';
 const IsJs = function(){
   this.render = rootComponent => {
     const root = document.querySelector(`[data-is='root']`);
@@ -10,8 +11,13 @@ const IsJs = function(){
     const binding = this.customBindings.get(bindingName);
     binding && typeof binding === 'function' && binding({node, component, type, accessor});
   };
+  this.components = new Set();
+  this.newComponent = () => {
+    const component = new Component();
+    this.components.add(component);
+    return component;
+  }
 };
 const instance = new IsJs();
 
-export { Component } from './component.js';
 export { instance as IsJs };
