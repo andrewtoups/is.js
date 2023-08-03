@@ -29,7 +29,7 @@ function Component(caller) {
   this.objs       = [];
   this.onMounts  = new Set();
   this.onMount = onMount => {onMount && typeof onMount === 'function' && this.onMounts.add(onMount)};
-  this.doOnMounts = () => {this.onMounts.forEach(cb => {cb(this.nodes)})};
+  this.doOnMounts = () => {this.onMounts.forEach(cb => {cb({nodes: this.nodes})})};
   this.template = async (htmlArr, ...values) => {
     const html = [htmlArr[0]];
     values.forEach((val, i) => {
