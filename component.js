@@ -3,7 +3,7 @@ import { IsJs } from './is.js';
 import { stateBindings } from './stateBindings.js';
 import { getConstructor, traverseFragment, parseDataBinding, stringIsNum, extractStates } from './utils.js';
 
-function Component(caller) {
+function Component() {
   this.params = new Map();
   this.addParam = ({name, value}) => {this.params.set(name, value)};
   this.bindingRefs = [];
