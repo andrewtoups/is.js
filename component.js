@@ -92,6 +92,7 @@ function Component() {
   this.handleBindings = async node => {
     const isElement = node.nodeType === 1;
     const childNodes = Array.from(node.childNodes);
+    if (childNodes) childNodes.forEach(this.handleBindings);
     const annotations = ['_func_', '_bool_', '_obj_', '_arr_', '_state_', '_is_', '_comp_'];
     const statefulBindings = isElement ? Object.values(node.attributes).filter(({value}) => {
       return annotations.some(str => value.includes(str));
@@ -261,8 +262,6 @@ function Component() {
       });
       applyBinding();
     }
-
-    if (childNodes) childNodes.forEach(this.handleBindings);
   };
 };
 export { Component };
