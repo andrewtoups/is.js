@@ -1,7 +1,7 @@
 import { StateManager, Is } from './engine.js';
 import { IsJs } from './is.js';
 import { stateBindings } from './stateBindings.js';
-import { getConstructor, traverseFragment, parseDataBinding, stringIsNum } from './utils.js';
+import { getConstructor, traverseFragment, parseDataBinding, stringIsNum, extractStates } from './utils.js';
 
 function Component(caller) {
   this.params = new Map();

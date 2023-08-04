@@ -22,4 +22,8 @@ export const unwrapAccessor = accessor => {
   return getConstructor(accessor) === 'StateManager' ? accessor.is() : getConstructor(accessor) === 'Is' ? accessor.evaluate() : null;
 };
 
+export const extractStates = accessor => {
+  return getConstructor(accessor) === 'StateManager' ? [accessor] : getConstructor(accessor) === 'Is' ? accessor.states : [];
+}
+
 export const stringIsNum = str => isNaN(+str) === false;
