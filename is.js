@@ -4,6 +4,7 @@ const IsJs = function(){
     const root = document.querySelector(`[data-is='root']`);
     root.appendChild(rootComponent.fragment);
     root.removeAttribute('data-is');
+    rootComponent.doOnMounts();
   };
   this.customBindings = new Map();
   this.addBinding = ({name, binding}) => {this.customBindings.set(name, binding)};
