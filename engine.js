@@ -21,9 +21,9 @@ export const StateManager = function(state) {
           this.onApplyBinding && typeof this.onApplyBinding === 'function' && this.onApplyBinding({bindingRef, component, val: this.val, newVal});
         }
       });
-    })
+    });
   };
-  this.is = test => this.val === true || this.val === test || this.val;
+  this.is = test => typeof test === 'undefined' ? this.val : this.val === true || this.val === test;
 };
 export function Is (arr, vals) {
   this.arr = arr;
