@@ -31,6 +31,8 @@ function Component() {
   this.onMounts  = new Set();
   this.onMount = onMount => {onMount && typeof onMount === 'function' && this.onMounts.add(onMount)};
   this.doOnMounts = () => {this.onMounts.forEach(cb => {cb({nodes: this.nodes})})};
+  this.deferredBindings = [];
+  this.applyDeferreds = () => {this.deferredBindings.forEach(cb => {cb && typeof cb === 'function' && cb()})};
   this.template = async (htmlArr, ...values) => {
     const html = [htmlArr[0]];
     values.forEach((val, i) => {
@@ -84,10 +86,9 @@ function Component() {
     traverseFragment(fragment, this.handleBindings);
     this.fragment = fragment;
     this.nodes = Array.from(fragment.childNodes);
+    this.applyDeferreds();
     this.initializing = false;
   };
-  this.deferredBindings = [];
-  this.applyDeferreds = () => {this.deferredBindings.forEach(cb => {cb && typeof cb === 'function' && cb()})};
   this.handleBindings = async node => {
     const isElement = node.nodeType === 1;
     const childNodes = Array.from(node.childNodes);
