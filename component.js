@@ -169,6 +169,10 @@ function Component() {
               applyBinding
             });
             applyBinding();
+          } else if (isArr) {
+            accessor.forEach(val => {node.classList.add(val)});
+          } else if (isStr) {
+            accessor.split(' ').forEach(val => {node.classList.add(val)});
           }
         break;
         
