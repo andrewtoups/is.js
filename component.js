@@ -83,9 +83,9 @@ function Component() {
     const template = document.createElement('template');
     template.innerHTML = html.join('').trim();
     const fragment = template.content.cloneNode(true);
-    traverseFragment(fragment, this.handleBindings);
     this.fragment = fragment;
-    this.nodes = Array.from(fragment.childNodes);
+    traverseFragment(this.fragment, this.handleBindings);
+    this.nodes = Array.from(this.fragment.childNodes);
     this.applyDeferreds();
     this.initializing = false;
   };
