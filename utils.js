@@ -4,7 +4,7 @@ export const select = type => Array.from(document.querySelectorAll(`[data-${type
 
 export const classList = arr => `'${arr.join(' ').trim()}'`;
 
-export const traverseFragment = (fragment, cb) => { Array.from(fragment.childNodes).filter(node => node.nodeType === 1).forEach(cb); };
+export const traverseFragment = (fragment, cb) => { Array.from(fragment.childNodes).forEach(cb); };
 
 const events = Object.keys(window).filter(key => key.startsWith('on')).map(key => key.slice(2).toLowerCase());
 const bindings = [
