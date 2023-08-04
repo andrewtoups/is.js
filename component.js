@@ -100,7 +100,7 @@ function Component(caller) {
     }) : [];
 
     const isText = node.nodeType === 3;
-    const textBinding = isText && node.textContent.includes(`_state_`) || node.textContent.includes(`_is_`);
+    const textBinding = isText && (node.textContent.includes(`_state_`) || node.textContent.includes(`_is_`));
 
     statefulBindings.forEach(({attr, accessor, type}) => {
       const isFunc  = type === 'func';
