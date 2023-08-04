@@ -35,7 +35,7 @@ function Component(caller) {
     values.forEach((val, i) => {
       switch (typeof val) {
         case 'function':
-          html.push(`func_${this.funcs.length}`);
+          html.push(`_func_${this.funcs.length}_`);
           this.funcs.push(val);
         break;
         case 'string':
@@ -43,30 +43,30 @@ function Component(caller) {
           html.push(val);
         break;
         case 'boolean':
-          html.push(`bool_${this.bools.length}`);
+          html.push(`_bool_${this.bools.length}_`);
           this.bools.push(val);
         break;
         case 'object':
 
           switch (getConstructor(val)) {
             case 'Array':
-              html.push(`arr_${this.arrs.length}`);
+              html.push(`_arr_${this.arrs.length}_`);
               this.arrs.push(val);
             break;
             case 'StateManager':
-              html.push(`state_${this.states.length}`);
+              html.push(`_state_${this.states.length}_`);
               this.states.push(val);
             break;
             case 'Is':
-              html.push(`is_${this.ises.length}`);
+              html.push(`_is_${this.ises.length}_`);
               this.ises.push(val);
             break;
             case 'Component':
-              html.push(`comp_${this.comps.length}`);
+              html.push(`_comp_${this.comps.length}_`);
               this.comps.push(val);
             break;
             default:
-              html.push(`obj_${this.objs.length}`);
+              html.push(`_obj_${this.objs.length}_`);
               this.objs.push(val);
             break;
           }
@@ -89,18 +89,18 @@ function Component(caller) {
   this.handleBindings = async node => {
     const isElement = node.nodeType === 1;
     const childNodes = Array.from(node.childNodes);
-    const annotations = ['func_', 'bool_', 'obj_', 'arr_', 'state_', 'is_', 'comp_'];
+    const annotations = ['_func_', '_bool_', '_obj_', '_arr_', '_state_', '_is_', '_comp_'];
     const statefulBindings = isElement ? Object.values(node.attributes).filter(({value}) => {
       return annotations.some(str => value.includes(str));
     }).map(({name, value}) => {
-      const [type, i] = value.split('_');
+      const [type, i] = value.slice(1).split('_');
       const dataRef = type === 'is' ? 'ises' : `${type}s`;
       const accessor = this[dataRef][parseInt(i)];
       return {attr: name, accessor, type};
     }) : [];
 
     const isText = node.nodeType === 3;
-    const textBinding = isText && node.textContent.includes(`state_`) || node.textContent.includes('is_');
+    const textBinding = isText && node.textContent.includes(`_state_`) || node.textContent.includes(`_is_`);
 
     statefulBindings.forEach(({attr, accessor, type}) => {
       const isFunc  = type === 'func';
