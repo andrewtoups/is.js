@@ -1,4 +1,4 @@
-import { getConstructor } from './utils.js';
+import { getConstructor, unwrapAccessor } from './utils.js';
 export const stateBindings = {
   'component': async ({node, component}) => {
     if (component && getConstructor(component) === 'Component') {

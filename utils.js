@@ -16,5 +16,10 @@ export const parseDataBinding = attr => {
     if (events.includes(type)) return 'event';
     else if (bindings.includes(type)) return type;
   } else return 'attr';
+};
+
+export const unwrapAccessor = accessor => {
+  return getConstructor(accessor) === 'StateManager' ? accessor.is() : getConstructor(accessor) === 'Is' ? accessor.evaluate() : null;
+};
 
 export const stringIsNum = str => isNaN(+str) === false;
