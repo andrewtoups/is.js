@@ -114,7 +114,6 @@ function Component(caller) {
 
       const isData = attr.startsWith('data-');
       
-      const is = isIs && accessor;
       const binding = parseDataBinding(attr);
       switch (binding) {
 
@@ -139,15 +138,15 @@ function Component(caller) {
             Array.from(node.childNodes).forEach(node => {replacement.appendChild(node)});
             const startIndex = Array.from(parentNode.childNodes).indexOf(node);
             node.replaceWith(replacement);
-            if (isIs) {
+            if (isIs || isState) {
               const nodeArr = [];
               for (let i = startIndex; i < startIndex+chunkSize; i++) {
                 nodeArr.push(parentNode.childNodes[i]);
               }
-              const applyBinding = () => {stateBindings['if']({nodeArr, parentNode, is, startIndex})};
+              const applyBinding = () => {stateBindings['if']({nodeArr, parentNode, accessor, startIndex})};
               this.bindingRefs.push({
                 component: this,
-                states: is.states,
+                states: extractStates(accessor),
                 binding: binding,
                 applyBinding: applyBinding
               });
@@ -157,12 +156,12 @@ function Component(caller) {
         break;
 
         case 'class':
-          if (isIs) {
+          if (isIs || isState) {
             const baseClassList = Array.from(node.classList);
-            const applyBinding = () => {stateBindings['class']({node, baseClassList, is})};
+            const applyBinding = () => {stateBindings['class']({node, baseClassList, is: accessor})};
             this.bindingRefs.push({
               component: this,
-              states: is.states,
+              states: accessor.states,
               binding,
               applyBinding
             });
@@ -193,7 +192,7 @@ function Component(caller) {
                 accessor.set(target.value);
               });
             }
-            const states = isIs ? is.states : isState ? [accessor] : [];
+            const states = extractStates(accessor);
             this.bindingRefs.push({
               component: this,
               states,
