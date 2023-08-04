@@ -72,8 +72,11 @@ export const stateBindings = {
     }
     if (['string', 'number'].includes(typeof result)) node.setAttribute(attr, result);
   }),
-  'text': ({node, is, state}) => {
-    if (is)    node.textContent = is.evaluate();
-    if (state) node.textContent = state.is();
+  'text': ({node, textMap}) => {
+    node.textContent = textMap.map(item => {
+      if (typeof item === 'string') return item;
+      else if (unwrapAccessor(item)) return unwrapAccessor(item);
+      else return '';
+    }).join('');
   }
 };

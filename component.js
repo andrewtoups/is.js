@@ -213,31 +213,47 @@ function Component(caller) {
       if (isData) node.removeAttribute(attr);
     });
     if (textBinding) {
-      const [typeStr, index] = node.textContent.trim().split('_');
-      const i = parseInt(index);
-      const isState = typeStr.includes('state');
-      const isIs = typeStr.includes('is');
-      if (isState) {
-        const state = this.states[i];
-        const applyBinding = () => stateBindings['text']({node, state});
-        this.bindingRefs.push({
-          component: this,
-          states: [state],
-          binding: 'text',
-          applyBinding
-        });
-        applyBinding();
-      } else if (isIs) {
-        const is = this.ises[i];
-        const applyBinding = () => stateBindings['text']({node, is});
-        this.bindingRefs.push({
-          component: this,
-          states: is.vals.filter(val => getConstructor(val) === 'StateManager'),
-          binding: 'text',
-          applyBinding
-        });
-        applyBinding();
-      }
+      let typeStr = null;
+      let lastIndex = null;
+      let justPushed = false;
+      const reset = () => {typeStr = null, lastIndex = null, justPushed = false};
+      const states = new Set();
+      const textMap = node.textContent.trim().split('_').reduce((result, item, i) => {
+        const subsequent = lastIndex !== null && i - lastIndex === 1;
+        if (['is', 'state'].includes(item) && subsequent === false) {
+          typeStr = item;
+          lastIndex = i;
+        } else if (subsequent === true && stringIsNum(item)) {
+          const i = parseInt(item);
+          const isState = typeStr === 'state', isIs = typeStr === 'is';
+          const accessor = isState ? this.states[i] : isIs ? this.ises[i] : null;
+          if (accessor !== null) {
+            if (isState) states.add(accessor);
+            else if (isIs) accessor.states.forEach(state => {states.add(state)});
+            result.push(accessor);
+            reset();
+            justPushed = true;
+          } else {
+            result.push(`_${typeStr}_${item}`);
+            reset();
+          }
+        } else if (subsequent === true) {
+          result.push(`_${typeStr}_${item}`);
+          reset();
+        } else {
+          result.push(i === 0 || justPushed ? item : `_${item}`);
+          justPushed = false;
+        }
+        return result;
+      }, []);
+      const applyBinding = () => stateBindings['text']({node, textMap});
+      this.bindingRefs.push({
+        component: this,
+        states: Array.from(states),
+        binding: 'text',
+        applyBinding
+      });
+      applyBinding();
     }
 
     if (childNodes) childNodes.forEach(this.handleBindings);
