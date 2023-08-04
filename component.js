@@ -4,6 +4,7 @@ import { stateBindings } from './stateBindings.js';
 import { getConstructor, traverseFragment, parseDataBinding, stringIsNum, extractStates } from './utils.js';
 
 function Component() {
+  this.initializing = true;
   this.params = new Map();
   this.addParam = ({name, value}) => {this.params.set(name, value)};
   this.bindingRefs = [];
@@ -83,6 +84,7 @@ function Component() {
     traverseFragment(fragment, this.handleBindings);
     this.fragment = fragment;
     this.nodes = Array.from(fragment.childNodes);
+    this.initializing = false;
   };
   this.deferredBindings = [];
   this.applyDeferreds = () => {this.deferredBindings.forEach(cb => {cb && typeof cb === 'function' && cb()})};
@@ -143,7 +145,7 @@ function Component() {
               for (let i = startIndex; i < startIndex+chunkSize; i++) {
                 nodeArr.push(parentNode.childNodes[i]);
               }
-              const applyBinding = () => {stateBindings['if']({nodeArr, parentNode, accessor, startIndex})};
+              const applyBinding = () => {stateBindings['if']({nodeArr, parentNode, accessor, startIndex, initializing: this.initializing})};
               this.bindingRefs.push({
                 component: this,
                 states: extractStates(accessor),
