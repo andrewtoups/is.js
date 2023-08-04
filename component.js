@@ -135,7 +135,7 @@ function Component() {
   
         case 'if':
           if (isBool && accessor === false) node.remove();
-          else {
+          else if (isBool && accessor === true || (isIs || isState)) {
             const parentNode = node.parentNode;
             const replacement = new DocumentFragment();
             const chunkSize = node.childNodes.length;
