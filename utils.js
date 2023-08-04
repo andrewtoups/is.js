@@ -16,4 +16,5 @@ export const parseDataBinding = attr => {
     if (events.includes(type)) return 'event';
     else if (bindings.includes(type)) return type;
   } else return 'attr';
-};
+
+export const stringIsNum = str => isNaN(+str) === false;
