@@ -3,7 +3,6 @@ export const stateBindings = {
   'component': async ({node, component}) => {
     if (component && getConstructor(component) === 'Component') {
       node.replaceWith(component.fragment);
-      component.applyDeferreds();
       component.doOnMounts();
     }
     else node.remove();
