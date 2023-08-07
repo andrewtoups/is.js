@@ -10,7 +10,7 @@ const IsJs = function(){
   this.addBinding = ({name, binding}) => {this.customBindings.set(name, binding)};
   this.parseCustomBinding = ({node, component, type, accessor, bindingName}) => {
     const binding = this.customBindings.get(bindingName);
-    binding && typeof binding === 'function' && binding({node, component, type, accessor});
+    return binding && typeof binding === 'function' && binding({node, component, type, accessor});
   };
   this.components = new Set();
   this.newComponent = () => {

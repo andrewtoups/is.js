@@ -213,7 +213,16 @@ function Component() {
         break;
   
         default:
-          IsJs.parseCustomBinding({node, accessor, component: this, bindingName: binding, type});
+          const applyBinding = IsJs.parseCustomBinding({node, accessor, component: this, bindingName: binding, type});
+          if ((isIs || isState) && applyBinding && typeof applyBinding === 'function') {
+            this.bindingRefs.push({
+              component: this,
+              states: extractStates(accessor),
+              binding,
+              applyBinding
+            });
+            applyBinding();
+          }
         break;
       }
       if (isData) node.removeAttribute(attr);
