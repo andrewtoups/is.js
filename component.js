@@ -144,8 +144,12 @@ function Component() {
             const startIndex = Array.from(parentNode.childNodes).indexOf(node);
             node.replaceWith(replacement);
             if (isIs || isState) {
-              const applyBinding = () => {stateBindings['if']({nodeArr, parentNode, accessor, startIndex, initializing: this.initializing})};
               const nodeArr = Array.from(parentNode.childNodes).slice(startIndex, startIndex+chunkSize);
+              const siblings = {
+                prev: parentNode.childNodes[startIndex].previousSibling,
+                next: parentNode.childNodes[startIndex+chunkSize].nextSibling
+              };
+              const applyBinding = () => {stateBindings['if']({nodeArr, parentNode, accessor, initializing: this.initializing, siblings})};
               this.bindingRefs.push({
                 component: this,
                 states: extractStates(accessor),

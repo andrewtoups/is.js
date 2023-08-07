@@ -25,15 +25,16 @@ export const stateBindings = {
     if (node.tagName === 'TEXTAREA') node.value = state.is();
     else node.setAttribute('value', state.is());
   },
-  'if': ({nodeArr, accessor, parentNode, startIndex, initializing}) => {
+  'if': ({nodeArr, accessor, parentNode, initializing, siblings}) => {
     const value = unwrapAccessor(accessor);
     const inDocument = parentNode.isConnected && nodeArr.every(node => node.isConnected === true);
     if ((inDocument || initializing) && value === false) nodeArr.forEach(node => {node.remove()});
     else if (!inDocument && value === true) {
+      const {prev, next} = siblings;
       const frag = new DocumentFragment();
       nodeArr.forEach(node => {frag.appendChild(node)});
-      if (parentNode.childNodes[startIndex + 1]) parentNode.insertBefore(frag, parentNode.childNodes[startIndex + 1]);
-      else parentNode.appendChild(frag);
+      if (parentNode.contains(next)) parentNode.insertBefore(frag, next);
+      else if (parentNode.contains(prev)) parentNode.insertBefore(frag, prev.nextSibling);
     }
   },
   'class': ({node, baseClassList, is}) => {
