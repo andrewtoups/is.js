@@ -1,13 +1,13 @@
 # IsJs
-An experimental, event-based Javascript framework. Designed to be unobtrusive and require no dependencies.
+An experimental, event-based Javascript framework. Designed to be tidy, unobtrusive, and require no dependencies.
 
 > [!WARNING]
 > 
 > This project is an alpha prototype and subject to sweeping, syntax-breaking changes. Feel free to play around, but it's not production-ready!
 
 ## Usage
-**IsJs** uses [tagged template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates) along with [data-* attributes](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes) to declare markup and data bindings for reuseable components.
-After components are parsed, all data-attributes and container elements are removed from the resulting markup, resulting in clean, unpolluted HTML.
+**`IsJs`** uses [tagged template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates) along with [data-* attributes](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes) to declare markup and data bindings for reuseable, reactive components.
+After components are parsed, all data-attributes and container elements are removed from the resulting markup, resulting in clean, unpolluted HTML. Because `IsJs` is purely event-based, this can be done without losing functionality.
 
 ### 1. Choose a root container and add a `data-is` attribute to.
 Using `body` is fine -- unlike parsed component containers, the root container is not removed on mounting.
