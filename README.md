@@ -11,6 +11,7 @@ After components are parsed, all data-attributes and container elements are remo
 
 ### 1. Choose a root container and add a `data-is` attribute to.
 Using `body` is fine -- unlike parsed component containers, the root container is not removed on mounting.
+
 <sub>**`index.html`**</sub>
 ```html
 <body data-is='root'>
