@@ -29,7 +29,7 @@ export const stateBindings = {
     const value = unwrapAccessor(accessor);
     const inDocument = parentNode.isConnected && nodeArr.every(node => parentNode.contains(node));
     if ((inDocument || initializing) && value === false) nodeArr.forEach(node => {node.remove()});
-    else if (!inDocument && value === true) {
+    else if (!initializing && !inDocument && value === true) {
       const {prev, next} = siblings;
       const frag = new DocumentFragment();
       nodeArr.forEach(node => {frag.appendChild(node)});
