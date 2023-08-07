@@ -1,4 +1,4 @@
-# Is.js
+# IsJs
 An experimental, event-based Javascript framework. Designed to be unobtrusive and require no dependencies.
 
 > [!WARNING]
@@ -197,20 +197,32 @@ IsJs.render(app);
 ```
 ## Other features
 ### Custom bindings with `IsJs.addCustomBinding()`
-This method takes a single object with two properties as its sole parameter:
+> [!NOTE]
+> 
+> This feature hasn't been extensively tested yet. If you encounter issues, please report them!
+
+You can extend the functionality of `IsJs` by registering your own custom bindings with `IsJs.addCustomBinding`.
+
+`addCustomBinding()` takes a single object with two properties as its sole parameter:
 * `name`: A string used to reference the binding as a `data-*` attribute (i.e., the binding `myBinding` can be used with the `data-myBinding` attribute).
-* `binding`: A function which takes an object with the following properties as its sole parameter:
-  * `node`: The [DOM Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) the binding is attached to.
-  * `component`: The `IsJs` `Component` that node is a child of.
-  * `accessor`: The value passed to the binding.
-  * `type`: The accessor's type. Not a primitive type, but a keyword from the following list. (Values of type `string`s and `number`s are always ignored and interpolated as normal.)
-    * `func`: A Javascript [function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function).
-    * `string`: A literal Javascript primitive [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) value.
-    * `bool`: A literal Javascript primitive [boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean) value.
-    * `arr`: A Javascript [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array) object.
-    * `obj`: A Javascript [object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object).
-    * `state`: An `IsJs` `StateManager` object (created when using `component.state()`).
-    * `is`: An `IsJs` `Is` object (created when using `component.is()`).
+* `binding`:
+  * A function which takes an object with the following properties as its sole parameter:
+    * `node`: The [DOM Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) the binding is attached to.
+    * `component`: The `IsJs` `Component` that node is a child of.
+    * `accessor`: The value passed to the binding. If the `type` (see below) is `state` or `is`, `accessor` can be passed to `IsJs.unwrapAccessor()` to retrieve its current value.
+    * `type`: The accessor's type. Not a primitive type, but a keyword from the following list. (Values of type `string`s and `number`s are always ignored and interpolated as normal.)
+      * `func`: A Javascript [function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function).
+      * `string`: A literal Javascript primitive [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) value.
+      * `bool`: A literal Javascript primitive [boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean) value.
+      * `arr`: A Javascript [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array) object.
+      * `obj`: A Javascript [object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object).
+      * `state`: An `IsJs` `StateManager` object (created when using `component.state()`).
+      * `is`: An `IsJs` `Is` object (created when using `component.is()`).
+  * Optionally returns a new `applyBinding` function that tells the engine how to react to changes of a `StateManager` or `Is` type `accessor`. Things to note:
+    * This function will only be registered if the binding's `accessor` is reactive, i.e. it's either a `StateManager` or `Is` object.
+    * Be sure to return the fucntion **without calling it**. `IsJs` will call it once per binding when first parsing markup and then subsequently for each binding when the `accessor` changes. Calling it here too could have unexpected side-effects.
+    * Be sure to use the **unwrapped** `accessor` object in the function body, and pass it to `unwrapAccessor()` to ensure that it reacts to new changes. If this function uses the unwrapped value, it will only update based on what the `accessor` initially evaluated to.
+      
 ### Using states
 The following methods can be used with `StateManager` objects:
 * `set(newValue)`: Pass a `newValue` to update the state.
