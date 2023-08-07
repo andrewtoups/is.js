@@ -1,6 +1,8 @@
 # IsJs
 An experimental, event-based Javascript framework. Designed to be tidy, unobtrusive, and require no dependencies.
 
+A demo of the below tutorial can be viewed [here](https://andrewtoups.github.io/isDemo/).
+
 > [!WARNING]
 > 
 > This project is an alpha prototype and subject to sweeping, syntax-breaking changes. Feel free to play around, but it's not production-ready!
@@ -48,9 +50,9 @@ const mood = 'hate';
 app.template`
 ```
 ```html
-  <div class="card-container">
+  <div class="card">
     <h2>Frameworks I ${mood}!</h2>
-    <ul class="hate-list">
+    <ul>
       <!-- to be populated -->
     </ul>
   </div>
@@ -84,22 +86,22 @@ const justKidding = IsJs.newComponent();
 justKidding.template`<p>Just kidding haha</p>`;
 
 const app = IsJs.newComponent();
-const feelingForgiving = true;
+const imSuchAGeminiLol = true;
 const mood = 'hate';
 
 app.template`
 ```
 ```html
-  <div class="card-container">
+  <div class="card">
     <h2>Frameworks I ${mood}!</h2>
-    <ul class="hate-list">
+    <ul>
       <div data-list=${listItems}></div>
     </ul>
-    <div data-if=${feelingForgiving}>
+    <div data-if=${imSuchAGeminiLol}>
       <div data-component=${justKidding}></div>
     </div>
-    <div data-if=${feelingForgiving === false}}>
-      <p>...or am I??</p>
+    <div data-if=${imSuchAGeminiLol === false}}>
+      <p>And I really mean it!!</p>
     </div>
   </div>
 ```
@@ -108,9 +110,15 @@ app.template`
 
 IsJs.render(app);
 ```
-### 5. Add stateful data by passing initial data to `Component.State()`. Bind it to the template by passing a javascript expression containing that state to `Component.is()`.
+### 5. Add stateful data by passing initial data to `component.state()`. Bind it to the template by passing a javascript expression containing that state to `component.is()`.
 * `Component.is()` is another tagged template method. It evaluates a js expression with interpolated states.
+* Inside an `is` expression, only use the plain `state` object. Calling `state.is()` will only return the value at runtime, and using `state.is` will cause the dreaded `[Object object]` string.
+* States can be set manually using `state.set()`.
+* Outside of bindings, pass a value to `state.is()` to check equality with the current value, or call it without a parameter to retrieve the current value.
+* States can be subscribed by passing a listener function to `state.onSet()`. See below for more on how this works.
 * Events can be bound by passing a function to the `data-{event}` binding.
+* `states` with boolean values can be toggled using the built-in `state.toggle()` method. Calling this method while the value is not boolean will throw a console error.
+* It's not necessary to destructure `is` from the `component` but it's a handy convention that keeps things succinct.
 
 <sub>**`index.js`**</sub>
 ```javascript
@@ -124,39 +132,46 @@ const list = [
 ];
 
 const listItems = list.map(item => {
-  const c = IsJs.newComponent()
+  const c = IsJs.newComponent();
   c.template`<li>${item}</li>`;
   return c;
 });
 
-const justKidding = IsJs.newComponent();
-justKidding.template`<p>Just kidding haha</p>`;
+function jklol() {
+  const c = IsJs.newComponent();
+  c.template`<p>Just kidding haha</p>`;
+  return c;
+}
+const justKidding = jklol();
 
 const app = IsJs.newComponent();
 const badMood = app.state(true);
-const feelingForgiving = app.state(false);
-const becomeForgiving = () => {feelingForgiving.set(true)};
-const is = app.is;
+const imSuchAGeminiLol = app.state(false);
+const orDoI = () => {imSuchAGeminiLol.set(true)};
+badMood.onSet(({newVal}) => {if (newVal === true) imSuchAGeminiLol.set(false)});
+const { is } = app;
 
 app.template`
 ```
 ```html
-<div class="card-container">
-  <h2>Frameworks I ${is`${badMood} === true ? 'hate' : 'love'`}!</h2>
-  <button data-click=${badMood.toggle}>Toggle Mood</button>
-  <div data-if=${is`${feelingForgiving} === false && ${badMood} === true`}>
-    <button data-click=${becomeForgiving}}>I'm feeling forgiving</button>
+  <div class='app' data-class=${is`[${badMood} === true ? 'bad-mood' : 'good-mood', ${imSuchAGeminiLol} && 'forgiving']`}>
+    <div class='card'>
+      <h2>Frameworks I ${is`${badMood} === true ? 'hate' : 'love'`}!</h2>
+      <ul>
+        <div data-list=${listItems}></div>
+      </ul>
+      <div data-if=${is`${badMood} === true && ${imSuchAGeminiLol} === true`}>
+        <div data-component=${justKidding}></div>
+      </div>
+      <div data-if=${is`${badMood} === true && ${imSuchAGeminiLol} === false`}>
+        <p>And I really mean it!!</p>
+      </div>
+      <button data-click=${badMood.toggle}>Toggle Mood</button>
+      <div data-if=${is`${imSuchAGeminiLol} === false && ${badMood} === true`}>
+        <button data-click=${orDoI}>...or do I??</button>
+      </div>
+    </div>
   </div>
-  <ul class="hate-list">
-    <div data-list=${listItems}></div>
-  </ul>
-  <div data-if=${is`${badMood} === true && ${feelingForgiving} === true`}>
-    <div data-component=${justKidding}></div>
-  </div>
-  <div data-if=${is`${badMood} === true && ${feelingForgiving} === false`}>
-    <p>And I really mean it!!</p>
-  </div>
-</div>
 ```
 ```javascript
 `;
@@ -164,8 +179,9 @@ app.template`
 IsJs.render(app);
 ```
 ### 6. Bind to attributes using any of the `data-*` attribute bindings.
-* The parser doesn't care if it's a real attribute or not.
-* However, binding to the `value` of an `input` or `select` element will create a bi-directional binding.
+* The parser doesn't care if it's binding to a real attribute or not. Do with that what you will.
+* Creating a `data-value` binding on an `input` or `select` element will create a bi-directional binding.
+* The `data-class` binding can resolve to either a single string or an array of strings. It can also be used in conjunction with the plain `class` attribute.
 
 <sub>**`index.js`**</sub>
 ```javascript
@@ -173,20 +189,22 @@ IsJs.render(app);
 app.template`
 ```
 ```html
-<div class="card-container">
-  <h2>Frameworks I ${is`${badMood} === true ? 'hate' : 'love'`}!</h2>
-  <button data-click=${badMood.toggle}>Toggle Mood</button>
-  <div data-if=${is`${feelingForgiving} === false && ${badMood} === true`}>
-    <button data-click=${becomeForgiving}}>I'm feeling forgiving</button>
-  </div>
-  <ul data-class=${is`${badMood} === true ? 'hate-list' : 'love-list'`}>
-    <div data-list=${listItems}></div>
-  </ul>
-  <div data-if=${is`${badMood} === true && ${feelingForgiving} === true`}>
-    <div data-component=${justKidding}></div>
-  </div>
-  <div data-if=${is`${badMood} === true && ${feelingForgiving} === false`}>
-    <p>And I really mean it!!</p>
+<div class='app' data-class=${is`[${badMood} === true ? 'bad-mood' : 'good-mood', ${imSuchAGeminiLol} && 'forgiving']`}>
+  <div class='card'>
+    <h2>Frameworks I ${is`${badMood} === true ? 'hate' : 'love'`}!</h2>
+    <ul>
+      <div data-list=${listItems}></div>
+    </ul>
+    <div data-if=${is`${badMood} === true && ${imSuchAGeminiLol} === true`}>
+      <div data-component=${justKidding}></div>
+    </div>
+    <div data-if=${is`${badMood} === true && ${imSuchAGeminiLol} === false`}>
+      <p>And I really mean it!!</p>
+    </div>
+    <button data-click=${badMood.toggle}>Toggle Mood</button>
+    <div data-if=${is`${imSuchAGeminiLol} === false && ${badMood} === true`}>
+      <button data-click=${orDoI}>...or do I??</button>
+    </div>
   </div>
 </div>
 ```
