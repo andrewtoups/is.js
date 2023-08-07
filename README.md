@@ -1,7 +1,7 @@
 # IsJs
 An experimental, event-based Javascript framework. Designed to be tidy, unobtrusive, and require no dependencies.
 
-A demo of the below tutorial can be viewed [here](https://andrewtoups.github.io/isDemo/).
+## [Click here to view a completed demo of the tutorial below.](https://andrewtoups.github.io/isDemo/)
 
 > [!WARNING]
 > 
