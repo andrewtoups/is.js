@@ -115,6 +115,7 @@ function Component() {
       const isComp  = type === 'comp';
       const isStr   = typeof accessor === 'string';
 
+      const isReactive = isIs || isState;
       const isData = attr.startsWith('data-');
       
       const binding = parseDataBinding(attr);
@@ -159,7 +160,7 @@ function Component() {
         break;
 
         case 'class':
-          if (isIs || isState) {
+          if (isReactive) {
             const baseClassList = Array.from(node.classList);
             const applyBinding = () => {stateBindings['class']({node, baseClassList, is: accessor})};
             this.bindingRefs.push({
@@ -192,7 +193,7 @@ function Component() {
           }
         break;
         case 'attr':
-          if (isState || isIs) {
+          if (isReactive) {
             const applyBinding = () => {stateBindings['attr']({node, attr, accessor})};
             if (isState && ['INPUT', 'TEXTAREA', 'SELECT'].includes(node.tagName) && attr === 'value') {
               node.addEventListener('change', ({target}) => {
@@ -214,7 +215,7 @@ function Component() {
   
         default:
           const applyBinding = IsJs.parseCustomBinding({node, accessor, component: this, bindingName: binding, type});
-          if ((isIs || isState) && applyBinding && typeof applyBinding === 'function') {
+          if (isReactive && applyBinding && typeof applyBinding === 'function') {
             this.bindingRefs.push({
               component: this,
               states: extractStates(accessor),
