@@ -6,8 +6,17 @@ An experimental, event-based Javascript framework. Designed to be tidy, unobtrus
 > This project is an alpha prototype and subject to sweeping, syntax-breaking changes. Feel free to play around, but it's not production-ready!
 
 ## Usage
-**`IsJs`** uses [tagged template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates) along with [data-* attributes](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes) to declare markup and data bindings for reuseable, reactive components.
-After components are parsed, all data-attributes and container elements are removed from the resulting markup, resulting in clean, unpolluted HTML. Because `IsJs` is purely event-based, this can be done without losing functionality.
+**IsJs** uses [tagged template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates) along with [data-* attributes](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes) to declare markup and data bindings for reuseable, reactive components.
+After components are parsed, all data-attributes and container elements are removed from the resulting markup, resulting in clean, unpolluted HTML. Because **IsJs** is purely event-based, this can be done without losing functionality.
+
+> [!NOTE]
+> 
+> IDE's will not usually provide HTML or Javascript syntax highlighting inside template literals, but there are a number of plugins that can provide this functionality given the appropriate tags. I haven't found any Visual Studio Code plugins that work reliably for user-configured tags, but [this](https://marketplace.visualstudio.com/items?itemName=sissel.language-literals) does the job reasonably well with the `html` and `js` tags. To use with **IsJs**, you can simply destructure the following methods from the `component` object and alias them accordingly, like so:
+> ```javascript
+> const app = IsJs.newComponent();
+> const { is: js, template: html } = app;
+> ```
+> I'll probably fork this extension someday and make it more configurable so it can be used without altering any code, but for now this is better than nothing!
 
 ### 1. Choose a root container and add a `data-is` attribute to.
 Using `body` is fine -- unlike parsed component containers, the root container is not removed on mounting.
@@ -102,15 +111,6 @@ IsJs.render(app);
 ### 5. Add stateful data by passing initial data to `Component.State()`. Bind it to the template by passing a javascript expression containing that state to `Component.is()`.
 * `Component.is()` is another tagged template method. It evaluates a js expression with interpolated states.
 * Events can be bound by passing a function to the `data-{event}` binding.
-
-> [!NOTE]
-> 
-> Most IDE's will not provide html or js syntax highlighting inside template literals, but there are a number of plugins that can provide this functionality given the appropriate tags. I haven't found any vscode plugins that work reliably for user-configured tags, but [this](https://marketplace.visualstudio.com/items?itemName=sissel.language-literals) Visual Studio Code plugin does the job reasonably well with the `html` and `js` tags. To use with IsJs, you can simply destructure those methods from the `component` object and alias them accordingly, like so:
-> ```javascript
-> const app = IsJs.newComponent();
-> const { is: js, template: html } = app;
-> ```
-> I'll probably fork this extension someday and make it more configurable so it can be used without altering your code, but for now this is better than nothing!
 
 <sub>**`index.js`**</sub>
 ```javascript
