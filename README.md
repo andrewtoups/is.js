@@ -6,7 +6,7 @@ An experimental, event-based Javascript framework. Designed to be unobtrusive an
 > This project is an alpha prototype and subject to sweeping, syntax-breaking changes. Feel free to play around, but it's not production-ready!
 
 ## Usage
-**Is.js** uses [tagged template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates) along with [data-* attributes](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes) to declare markup and data bindings for reuseable components.
+**IsJs** uses [tagged template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates) along with [data-* attributes](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes) to declare markup and data bindings for reuseable components.
 After components are parsed, all data-attributes and container elements are removed from the resulting markup, resulting in clean, unpolluted HTML.
 
 ### 1. Choose a root container and add a `data-is` attribute to.
