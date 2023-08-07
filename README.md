@@ -101,7 +101,15 @@ IsJs.render(app);
 ### 5. Add stateful data by passing initial data to `Component.State()`. Bind it to the template by passing a javascript expression containing that state to `Component.is()`.
 * `Component.is()` is another tagged template method. It evaluates a js expression with interpolated states.
 * Events can be bound by passing a function to the `data-{event}` binding.
-* Syntax highlighting is for losers! There are [IDE extensions](https://marketplace.visualstudio.com/items?itemName=Tobermory.es6-string-html) for that though.
+
+> [!NOTE]
+> 
+> Most IDE's will not provide html or js syntax highlighting inside template literals, but there are a number of plugins that can provide this functionality given the appropriate tags. I haven't found any vscode plugins that work reliably for user-configured tags, but [this](https://marketplace.visualstudio.com/items?itemName=sissel.language-literals) Visual Studio Code plugin does the job reasonably well with the `html` and `js` tags. To use with IsJs, you can simply destructure those methods from the `component` object and alias them accordingly, like so:
+> ```javascript
+> const app = IsJs.newComponent();
+> const { is: js, template: html } = app;
+> ```
+> I'll probably fork this extension someday and make it more configurable so it can be used without altering your code, but for now this is better than nothing!
 
 <sub>**`index.js`**</sub>
 ```javascript
