@@ -1,4 +1,5 @@
 import { Component } from './component.js';
+import { unwrapAccessor } from './utils.js';
 const IsJs = function(){
   this.render = rootComponent => {
     const root = document.querySelector(`[data-is='root']`);
@@ -18,6 +19,7 @@ const IsJs = function(){
     this.components.add(component);
     return component;
   }
+  this.unwrapAccessor = unwrapAccessor;
 };
 const instance = new IsJs();
 
