@@ -13,11 +13,11 @@ function Component() {
     stateMan.components.add(this);
     return stateMan;
   };
-  this.is = (strArr, ...states) => {
-    states.forEach(state => {
+  this.is = (strArr, ...values) => {
+    values.filter(val => getConstructor(val) === 'StateManager').forEach(state => {
       state.components.add(this);
     });
-    return new Is(strArr, states);
+    return new Is(strArr, values);
   };
   this.fragment   = null;
   this.arrs       = [];
