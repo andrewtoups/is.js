@@ -5,7 +5,7 @@ An experimental, event-based Javascript framework. Designed to be tidy, unobtrus
 
 > [!WARNING]
 > 
-> This project is an alpha prototype and subject to sweeping, syntax-breaking changes. Feel free to play around, but it's not production-ready!
+> This project is an alpha prototype and subject to sweeping, syntax-breaking changes. There are still some critical functionalities missing or in development. Feel free to play around, but it's not production-ready!
 
 ## Usage
 **IsJs** uses [tagged template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates) along with [data-* attributes](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes) to declare markup and data bindings for reuseable, reactive components.
